@@ -8,6 +8,13 @@ if (!key) {
   process.exit(1);
 }
 
+const root = path.join(__dirname, '..');
+const outDir = path.join(root, 'public');
+
+fs.mkdirSync(outDir, { recursive: true });
+
+fs.cpSync(path.join(root, 'img'), path.join(outDir, 'img'), { recursive: true, force: true });
+
 const files = [
   'index.html',
   'products.html',
@@ -17,16 +24,17 @@ const files = [
 ];
 
 for (const file of files) {
-  const filePath = path.join(__dirname, '..', file);
-  let content = fs.readFileSync(filePath, 'utf-8');
+  const srcPath = path.join(root, file);
+  const outPath = path.join(outDir, file);
+  let content = fs.readFileSync(srcPath, 'utf-8');
   const replaced = content.replace(/__POSTHOG_KEY__/g, key);
 
   if (content === replaced) {
     console.warn(`WARNING: No placeholder found in ${file}`);
-  } else {
-    fs.writeFileSync(filePath, replaced);
-    console.log(`OK: ${file}`);
   }
+
+  fs.writeFileSync(outPath, replaced);
+  console.log(`OK: ${file}`);
 }
 
-console.log('Done. PostHog key injected.');
+console.log('Done. PostHog key injected into public/');
