@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FashionHero — Statystyki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--charcoal:#1a1a1a;--warm-gray:#8a7d6b;--cream:#f0ede6;--cream-light:#f5f0eb;--accent:#c4a060;--white:#fff;--border:rgba(0,0,0,0.05)}
+        body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--cream-light);color:var(--charcoal)}
+        .nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+        .nav-inner{display:flex;align-items:center;height:56px;padding:0 32px;gap:24px}
+        .nav-logo{font-size:20px;font-weight:600;font-style:italic;letter-spacing:-0.025em;color:var(--charcoal);text-decoration:none}
+        .nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+        .nav-store{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;color:var(--charcoal);border:1px solid var(--charcoal);border-radius:9999px;padding:7px 16px;text-decoration:none;transition:all .2s}
+        .nav-store:hover{background:var(--charcoal);color:var(--white)}
+        .nav-user{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+        .nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--white)}
+        .layout{display:flex;min-height:calc(100vh - 57px)}
+        .sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:24px 0;flex-shrink:0}
+        .sidebar-item{padding:10px 24px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--warm-gray);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;text-decoration:none}
+        .sidebar-item:hover{color:var(--charcoal);background:var(--cream-light)}
+        .sidebar-item.active{color:var(--charcoal);background:var(--cream-light);font-weight:600}
+        .sidebar-promote{color:var(--accent)!important}
+        .sidebar-new{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--accent);color:var(--white);padding:2px 5px;margin-left:4px}
+        .main{flex:1;padding:40px}
+        .page-title{font-size:28px;font-weight:400;letter-spacing:-0.01em;margin-bottom:4px}
+        .page-subtitle{font-size:14px;color:var(--warm-gray);margin-bottom:32px}
+        .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+        .metric-card{background:var(--white);border:1px solid var(--border);padding:24px}
+        .metric-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--warm-gray);margin-bottom:12px}
+        .metric-value{font-size:36px;font-weight:400;letter-spacing:-0.02em}
+        .metric-change{font-size:12px;margin-top:4px}
+        .metric-change.up{color:#3d5a3d}
+        .metric-change.down{color:#e07a5f}
+        .metric-bar{height:4px;background:var(--cream);margin-top:12px;position:relative}
+        .metric-bar-fill{height:100%;background:var(--charcoal)}
+        .section-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--warm-gray);margin-bottom:16px;margin-top:40px}
+        .chart-placeholder{background:var(--white);border:1px solid var(--border);padding:40px;text-align:center;color:var(--warm-gray);font-size:13px}
+        .chart-bars{display:flex;align-items:flex-end;gap:8px;height:160px;padding:0 20px;margin-top:20px}
+        .chart-bar{flex:1;background:var(--charcoal);position:relative;transition:all .3s}
+        .chart-bar:hover{background:var(--accent)}
+        .chart-month{font-size:10px;color:var(--warm-gray);text-align:center;margin-top:8px;text-transform:uppercase;letter-spacing:.5px}
+        .chart-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:0}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(26,26,26,.5);z-index:1000;align-items:center;justify-content:center}
+        .overlay.active{display:flex}
+        .modal{background:var(--white);max-width:440px;width:100%;padding:48px 40px}
+        .modal-icon{font-size:40px;margin-bottom:20px;text-align:center}
+        .modal h2{font-size:24px;font-weight:400;text-align:center;margin-bottom:8px}
+        .modal p{font-size:14px;color:var(--warm-gray);text-align:center;line-height:1.6;margin-bottom:28px}
+        .modal-form{display:flex;flex-direction:column;gap:10px}
+        .modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,0,0,.1);background:var(--white);font-size:14px;font-family:inherit;transition:border-color .2s}
+        .modal-input:focus{outline:none;border-color:var(--charcoal)}
+        .modal-input::placeholder{color:#b0a899}
+        .btn-primary{width:100%;padding:14px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;background:var(--charcoal);color:var(--white);border:none;border-radius:9999px;cursor:pointer;font-family:inherit}
+        .btn-primary:hover{background:#333}
+        .btn-skip{font-size:12px;color:var(--warm-gray);text-align:center;cursor:pointer;margin-top:8px}
+        .btn-skip:hover{color:var(--charcoal)}
+        .modal-success{text-align:center}
+        .modal-success .check{font-size:48px;margin-bottom:16px}
+        .modal-success p{margin-bottom:24px}
+        .btn-back{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;background:var(--white);color:var(--charcoal);border:1px solid var(--charcoal);border-radius:9999px;cursor:pointer;font-family:inherit;text-decoration:none}
+        .btn-back:hover{background:var(--charcoal);color:var(--white)}
+        .learn-more{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+        .learn-more p{font-size:12px;color:var(--warm-gray);text-align:center;line-height:1.6}
+        .learn-more strong{color:var(--charcoal)}
+    </style>
+</head>
+<body>
+    <nav class="nav"><div class="nav-inner"><a href="dashboard.html" class="nav-logo">FashionHero</a><div class="nav-right"><a href="search-results.html" class="nav-store">Przeglądaj sklep →</a><span class="nav-user">Moda Kamila</span><div class="nav-avatar">MK</div></div></div></nav>
+    <div class="layout">
+        <div class="sidebar">
+            <a href="dashboard.html" class="sidebar-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+            <a href="products.html" class="sidebar-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Produkty</a>
+            <a href="orders.html" class="sidebar-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Zamówienia</a>
+            <a href="stats.html" class="sidebar-item active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Statystyki</a>
+            <div class="sidebar-item sidebar-promote" onclick="openFakeDoor('sidebar','Sidebar navigation')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Promuj produkty <span class="sidebar-new">Nowe</span></div>
+        </div>
+        <div class="main">
+            <h1 class="page-title">Statystyki</h1>
+            <p class="page-subtitle">Ostatnie 30 dni na FashionHero</p>
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">Przychody</div>
+                    <div class="metric-value">8 247 zł</div>
+                    <div class="metric-change up">+12% vs poprzedni miesiąc</div>
+                    <div class="metric-bar"><div class="metric-bar-fill" style="width:72%"></div></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Śr. wartość zamówienia</div>
+                    <div class="metric-value">201 zł</div>
+                    <div class="metric-change down">-4% vs poprzedni miesiąc</div>
+                    <div class="metric-bar"><div class="metric-bar-fill" style="width:65%"></div></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Stopa zwrotów</div>
+                    <div class="metric-value">26%</div>
+                    <div class="metric-change down">+3 p.p. vs poprzedni miesiąc</div>
+                    <div class="metric-bar"><div class="metric-bar-fill" style="width:26%;background:#e07a5f"></div></div>
+                </div>
+            </div>
+            <div class="section-title">Przychody miesięczne</div>
+            <div class="chart-placeholder">
+                <div style="font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:4px">Ostatnie 12 miesięcy</div>
+                <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:0;align-items:end;height:160px;padding:0 4px">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:48px;flex:0 0 48px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray);letter-spacing:.3px">Lip</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:60px;flex:0 0 60px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Sie</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:72px;flex:0 0 72px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Wrz</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:88px;flex:0 0 88px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Paź</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:96px;flex:0 0 96px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Lis</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:112px;flex:0 0 112px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Gru</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:104px;flex:0 0 104px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Sty</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:108px;flex:0 0 108px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Lut</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:116px;flex:0 0 116px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Mar</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warm-gray);height:120px;flex:0 0 120px;width:100%"></div><span style="font-size:10px;color:var(--warm-gray)">Kwi</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--charcoal);height:124px;flex:0 0 124px;width:100%"></div><span style="font-size:10px;color:var(--charcoal);font-weight:600">Maj</span></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--accent);height:130px;flex:0 0 130px;width:100%"></div><span style="font-size:10px;color:var(--accent);font-weight:600">Cze</span></div>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px">
+                <div class="metric-card">
+                    <div class="metric-label">Top product</div>
+                    <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:8px">Skórzana torba shopper</div>
+                    <div style="font-size:11px;color:var(--warm-gray);margin-top:4px">1 203 wyświetleń · 19 sprzedanych · 2 zwroty</div>
+                    <div style="font-size:14px;font-weight:500;margin-top:8px">5 491 zł przychodu</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Najwyższy zwrot</div>
+                    <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:8px">Szpilki nude 8cm</div>
+                    <div style="font-size:11px;color:var(--warm-gray);margin-top:4px">389 wyświetleń · 5 sprzedanych · 2 zwroty</div>
+                    <div style="font-size:14px;font-weight:500;color:#e07a5f;margin-top:8px">40% stopa zwrotów</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"><div class="modal"><div id="modal-form" style="display:flex;flex-direction:column;gap:0"><div class="modal-icon">🚀</div><h2>Reklama na FashionHero</h2><p>Funkcja promowania produktów jest w fazie testowania. Pozwoli Ci wyświetlać Twoje produkty na szczycie wyników wyszukiwania — płacisz tylko za kliknięcie.<br><br>Zostaw e-mail, a powiadomimy Cię o starcie.</p><div class="modal-form"><input type="email" id="email-input" class="modal-input" placeholder="twoj@email.pl"><button class="btn-primary" onclick="submitEmail()">Powiadom mnie o starcie</button></div><div class="btn-skip" onclick="closeOverlay()">Może później</div><div class="learn-more"><p><strong>Jak to będzie działać?</strong><br>Wybierasz produkty, ustallasz słowa kluczowe i budżet. Twój produkt pojawia się na pozycji 1-2 w wynikach wyszukiwania z tagiem "Sponsorowane". Płacisz tylko za kliknięcie — od 0,10 zł. Średni ROAS na marketplace: 4,2x.</p></div></div><div id="modal-success" class="modal-success" style="display:none"><div class="check">✓</div><h2>Dziękujemy, Kamilo!</h2><p>Powiadomimy Cię jako jednego z pierwszych, gdy uruchomimy reklamy na FashionHero.</p><a href="#" class="btn-back" onclick="closeOverlay();return false">Wróć do panelu</a></div></div></div>
+    <script>
+    function openFakeDoor(s,n){console.log(`[FAKE DOOR] click | source=${s} | ts=${new Date().toISOString()}`);document.getElementById('overlay').classList.add('active');document.getElementById('modal-form').style.display='flex';document.getElementById('modal-success').style.display='none';document.getElementById('email-input').value='';document.getElementById('email-input').style.borderColor='';setTimeout(()=>document.getElementById('email-input').focus(),100)}
+    function submitEmail(){const e=document.getElementById('email-input').value;if(!e||!e.includes('@')||!e.includes('.')){document.getElementById('email-input').style.borderColor='#e07a5f';return}console.log(`[FAKE DOOR] email_captured | email=${e} | ts=${new Date().toISOString()}`);document.getElementById('modal-form').style.display='none';document.getElementById('modal-success').style.display='block'}
+    function closeOverlay(){console.log(`[FAKE DOOR] overlay_closed | ts=${new Date().toISOString()}`);document.getElementById('overlay').classList.remove('active')}
+    document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeOverlay()});
+    document.getElementById('email-input').addEventListener('keydown',function(e){if(e.key==='Enter')submitEmail()});
+    </script>
+</body>
+</html>

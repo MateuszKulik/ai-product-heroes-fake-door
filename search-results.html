@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FashionHero — czarna sukienka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--charcoal:#1a1a1a;--warm-gray:#8a7d6b;--cream:#f0ede6;--cream-light:#f5f0eb;--accent:#c4a060;--white:#fff;--border:rgba(0,0,0,0.05)}
+        body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--cream-light);color:var(--charcoal)}
+        .nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+        .nav-inner{max-width:80rem;margin:0 auto;display:flex;align-items:center;height:56px;padding:0 32px;gap:16px}
+        .nav-logo{font-size:20px;font-weight:600;font-style:italic;letter-spacing:-0.025em;color:var(--charcoal);text-decoration:none}
+        .search-bar{flex:1;max-width:560px}
+        .search-input{width:100%;padding:10px 16px 10px 40px;border:1px solid rgba(0,0,0,.1);background:var(--cream-light);font-size:14px;font-family:inherit}
+        .search-input:focus{outline:none;border-color:var(--charcoal);background:var(--white)}
+        .search-wrapper{position:relative}
+        .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.4}
+        .nav-right{display:flex;align-items:center;gap:16px;margin-left:auto}
+        .nav-icon{width:20px;height:20px;opacity:.7;transition:opacity .2s;cursor:pointer}
+        .nav-icon:hover{opacity:1}
+        .nav-cart{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+        .filters{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:8px;max-width:80rem;margin:0 auto}
+        .filter{padding:8px 16px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;border:1px solid rgba(0,0,0,.1);background:var(--white);cursor:pointer;transition:all .2s}
+        .filter:hover{border-color:var(--charcoal)}
+        .filter.active{background:var(--charcoal);color:var(--white);border-color:var(--charcoal)}
+        .results-area{max-width:80rem;margin:0 auto;padding:24px 32px}
+        .results-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .results-count{font-size:12px;color:var(--warm-gray)}
+        .results-count strong{color:var(--charcoal)}
+        .sort-select{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;padding:8px 16px;border:1px solid rgba(0,0,0,.1);background:var(--white);font-family:inherit;cursor:pointer}
+        .divider-sponsored{display:flex;align-items:center;gap:12px;margin-bottom:12px;margin-top:8px}
+        .divider-sponsored::before,.divider-sponsored::after{content:'';flex:1;height:1px;background:rgba(0,0,0,.1)}
+        .divider-sponsored span{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--warm-gray)}
+        .organic-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--warm-gray);margin:20px 0 12px}
+        .result-card{display:grid;grid-template-columns:220px 1fr;background:var(--white);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;transition:all .3s}
+        .result-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+        .result-card.sponsored{border:2px solid var(--accent)}
+        .result-image{background:var(--cream);display:flex;align-items:center;justify-content:center;position:relative;aspect-ratio:1;overflow:hidden}
+        .result-image img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+        .result-card:hover .result-image img{transform:scale(1.05)}
+        .badge-sponsored{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:var(--accent);color:var(--white);padding:3px 8px;position:absolute;top:12px;left:12px}
+        .result-content{padding:20px 24px;display:flex;flex-direction:column;justify-content:center}
+        .result-seller{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--warm-gray);display:flex;align-items:center;gap:6px}
+        .seller-pro{font-size:9px;font-weight:600;background:rgba(26,26,26,.1);color:rgba(26,26,26,.7);padding:1px 4px;text-transform:uppercase;letter-spacing:.5px}
+        .result-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin:4px 0}
+        .result-color{font-size:12px;color:var(--warm-gray)}
+        .result-price{font-size:14px;font-weight:500;margin:4px 0}
+        .result-price .old-price{font-size:12px;color:var(--warm-gray);text-decoration:line-through;font-weight:400;margin-left:8px}
+        .result-meta{font-size:11px;color:var(--warm-gray);display:flex;gap:12px;margin-top:2px}
+        .result-rating{color:var(--accent)}
+        .sponsored-note{font-size:11px;color:var(--warm-gray);margin-top:4px}
+        .result-actions{margin-top:auto;padding-top:8px}
+        .btn-add{display:inline-flex;align-items:center;justify-content:center;padding:8px 20px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;background:var(--charcoal);color:var(--white);border:1px solid var(--charcoal);cursor:pointer;transition:all .2s;font-family:inherit}
+        .btn-add:hover{background:#333}
+        .nav-tabs{display:flex;gap:24px;margin-left:24px}
+        .nav-tab{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--warm-gray);text-decoration:none;padding-bottom:2px;border-bottom:2px solid transparent;transition:all .2s}
+        .nav-tab:hover{color:var(--charcoal)}
+        .nav-tab.active{color:var(--charcoal);border-bottom-color:var(--charcoal)}
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="dashboard.html" class="nav-logo">FashionHero</a>
+            <div class="nav-tabs">
+                <a href="#" class="nav-tab">MEN</a>
+                <a href="#" class="nav-tab">WOMEN</a>
+                <a href="#" class="nav-tab active">SALE</a>
+                <a href="#" class="nav-tab">NEW</a>
+            </div>
+            <div class="search-bar">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" class="search-input" value="czarna sukienka">
+                </div>
+            </div>
+            <div class="nav-right">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <span class="nav-cart">🛒 0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="filters">
+        <div class="filter active">Wszystkie</div>
+        <div class="filter">Sukienki</div>
+        <div class="filter">Cocktail</div>
+        <div class="filter">Midi</div>
+        <div class="filter">Mini</div>
+        <div class="filter">Rozmiar</div>
+        <div class="filter">Cena</div>
+        <div class="filter">Kolor</div>
+    </div>
+
+    <div class="results-area">
+        <div class="results-meta">
+            <div class="results-count"><strong>127</strong> wyników dla "czarna sukienka"</div>
+            <select class="sort-select">
+                <option>Najbardziej trafne</option>
+                <option>Cena: rosnąco</option>
+                <option>Cena: malejąco</option>
+                <option>Najnowsze</option>
+            </select>
+        </div>
+
+        <div class="divider-sponsored"><span>Sponsorowane</span></div>
+
+        <div class="result-card sponsored">
+            <div class="result-image">
+                <span class="badge-sponsored">Sponsorowane</span>
+                <img src="img/czarna-sukienka.jpg" alt="" loading="lazy">
+            </div>
+            <div class="result-content">
+                <div class="result-seller">Moda Kamila <span class="seller-pro">Pro</span></div>
+                <div class="result-title">Elegancka czarna sukienka midi <span class="badge-sponsored" style="vertical-align:middle;margin-left:4px">Sponsorowane</span></div>
+                <div class="result-color">Satyna · Rozmiary XS-XL</div>
+                <div class="result-price">199 zł <span class="old-price">279 zł</span></div>
+                <div class="result-meta">
+                    <span class="result-rating">★★★★ 4.2</span>
+                    <span>47 opinii</span>
+                    <span>Darmowa dostawa</span>
+                </div>
+                <div class="sponsored-note">Reklama sprzedawcy · CPC 0,50 zł</div>
+                <div class="result-actions">
+                    <button class="btn-add">Dodaj do koszyka</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card sponsored">
+            <div class="result-image">
+                <span class="badge-sponsored">Sponsorowane</span>
+                <img src="img/plaszcz.jpg" alt="" loading="lazy">
+            </div>
+            <div class="result-content">
+                <div class="result-seller">Butik Noir <span class="seller-pro">Pro</span></div>
+                <div class="result-title">Czarna sukienka koronkowa — wieczorowa <span class="badge-sponsored" style="vertical-align:middle;margin-left:4px">Sponsorowane</span></div>
+                <div class="result-color">Koronka · Rozmiary S-XXL</div>
+                <div class="result-price">349 zł</div>
+                <div class="result-meta">
+                    <span class="result-rating">★★★★★ 4.8</span>
+                    <span>122 opinie</span>
+                    <span>Darmowa dostawa</span>
+                </div>
+                <div class="sponsored-note">Reklama sprzedawcy · CPC 0,75 zł</div>
+                <div class="result-actions">
+                    <button class="btn-add">Dodaj do koszyka</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="organic-label">Wyniki organiczne</div>
+
+        <div class="result-card">
+            <div class="result-image">
+                <img src="img/torba.jpg" alt="" loading="lazy">
+            </div>
+            <div class="result-content">
+                <div class="result-seller">Street Style PL</div>
+                <div class="result-title">Czarna sukienka A-line — bawełna organiczna</div>
+                <div class="result-color">Bawełna · Rozmiary S-L</div>
+                <div class="result-price">159 zł</div>
+                <div class="result-meta">
+                    <span class="result-rating">★★★★ 4.0</span>
+                    <span>31 opinii</span>
+                    <span>Dostawa 9,99 zł</span>
+                </div>
+                <div class="result-actions">
+                    <button class="btn-add">Dodaj do koszyka</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="result-image">
+                <img src="img/szpilki.jpg" alt="" loading="lazy">
+            </div>
+            <div class="result-content">
+                <div class="result-seller">Czerwona Sukienka</div>
+                <div class="result-title">Czarna sukienka bodycon — klasyk na wieczór</div>
+                <div class="result-color">Elastan · Rozmiary XS-L</div>
+                <div class="result-price">219 zł <span class="old-price">299 zł</span></div>
+                <div class="result-meta">
+                    <span class="result-rating">★★★ 3.9</span>
+                    <span>87 opinii</span>
+                    <span>Darmowa dostawa od 150 zł</span>
+                </div>
+                <div class="result-actions">
+                    <button class="btn-add">Dodaj do koszyka</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="result-image">
+                <img src="img/szorty.jpg" alt="" loading="lazy">
+            </div>
+            <div class="result-content">
+                <div class="result-seller">Kolekcja Ewy</div>
+                <div class="result-title">Czarna sukienka wrap — jeans casual</div>
+                <div class="result-color">Jeans · Rozmiary M-XXL</div>
+                <div class="result-price">189 zł</div>
+                <div class="result-meta">
+                    <span class="result-rating">★★★ 3.5</span>
+                    <span>15 opinii</span>
+                    <span>Dostawa 12 zł</span>
+                </div>
+                <div class="result-actions">
+                    <button class="btn-add">Dodaj do koszyka</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('[FAKE DOOR] search_results_loaded | query="czarna sukienka" | sponsored=2 | organic=3 | ts=' + new Date().toISOString());
+    </script>
+</body>
+</html>

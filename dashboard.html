@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FashionHero — Panel Sprzedawcy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--charcoal:#1a1a1a;--warm-gray:#8a7d6b;--cream:#f0ede6;--cream-light:#f5f0eb;--accent:#c4a060;--white:#fff;--border:rgba(0,0,0,0.05)}
+        body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--cream-light);color:var(--charcoal)}
+        .nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+        .nav-inner{max-width:100%;margin:0 auto;display:flex;align-items:center;height:56px;padding:0 32px;gap:24px}
+        .nav-logo{font-size:20px;font-weight:600;font-style:italic;letter-spacing:-0.025em;color:var(--charcoal);text-decoration:none}
+        .nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+        .nav-store{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.6px;color:var(--charcoal);border:1px solid var(--charcoal);border-radius:9999px;padding:7px 16px;text-decoration:none;transition:all .2s}
+        .nav-store:hover{background:var(--charcoal);color:var(--white)}
+        .nav-user{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+        .nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--white)}
+        .layout{display:flex;min-height:calc(100vh - 57px)}
+        .sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:24px 0;flex-shrink:0}
+        .sidebar-item{padding:10px 24px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;color:var(--warm-gray);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;text-decoration:none}
+        .sidebar-item:hover{color:var(--charcoal);background:var(--cream-light)}
+        .sidebar-item.active{color:var(--charcoal);background:var(--cream-light);font-weight:600}
+        .sidebar-promote{color:var(--accent)!important}
+        .sidebar-new{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--accent);color:var(--white);padding:2px 5px;margin-left:4px}
+        .main{flex:1;padding:40px;max-width:900px}
+        .welcome h1{font-size:28px;font-weight:400;letter-spacing:-0.01em;margin-bottom:4px}
+        .welcome p{font-size:14px;color:var(--warm-gray)}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:32px 0}
+        .stat-card{background:var(--white);border:1px solid var(--border);padding:20px}
+        .stat-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;color:var(--warm-gray);margin-bottom:8px}
+        .stat-value{font-size:24px;font-weight:500}
+        .stat-change{font-size:12px;margin-top:4px}
+        .stat-change.up{color:#3d5a3d}
+        .stat-change.down{color:#e07a5f}
+        .section-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;color:var(--warm-gray);margin-bottom:16px}
+        .products-table{background:var(--white);border:1px solid var(--border)}
+        .products-header{display:grid;grid-template-columns:2.5fr .8fr 1fr .8fr .8fr 140px;padding:12px 20px;border-bottom:1px solid var(--border)}
+        .products-header span{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.8px;color:var(--warm-gray)}
+        .product-row{display:grid;grid-template-columns:2.5fr .8fr 1fr .8fr .8fr 140px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,0.03);align-items:center;transition:background .2s}
+        .product-row:hover{background:var(--cream-light)}
+        .product-row:last-child{border-bottom:none}
+        .product-info{display:flex;align-items:center;gap:12px}
+        .product-thumb{width:48px;height:48px;border-radius:0;overflow:hidden;flex-shrink:0}
+        .product-thumb img{width:100%;height:100%;object-fit:cover}
+        .product-name{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+        .product-sku{font-size:11px;color:var(--warm-gray);margin-top:2px}
+        .product-cell{font-size:12px}
+        .product-cell.muted{color:var(--warm-gray)}
+        .btn-promote{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;color:var(--charcoal);background:var(--white);border:1px solid var(--charcoal);border-radius:9999px;cursor:pointer;transition:all .2s;font-family:inherit}
+        .btn-promote:hover{background:var(--charcoal);color:var(--white)}
+        .overlay{display:none;position:fixed;inset:0;background:rgba(26,26,26,0.5);z-index:1000;align-items:center;justify-content:center}
+        .overlay.active{display:flex}
+        .modal{background:var(--white);max-width:440px;width:100%;padding:48px 40px}
+        .modal-icon{font-size:40px;margin-bottom:20px;text-align:center}
+        .modal h2{font-size:24px;font-weight:400;text-align:center;margin-bottom:8px;letter-spacing:-0.01em}
+        .modal p{font-size:14px;color:var(--warm-gray);text-align:center;line-height:1.6;margin-bottom:28px}
+        .modal-form{display:flex;flex-direction:column;gap:10px}
+        .modal-input{width:100%;padding:12px 16px;border:1px solid rgba(0,0,0,0.1);background:var(--white);font-size:14px;font-family:inherit;transition:border-color .2s}
+        .modal-input:focus{outline:none;border-color:var(--charcoal)}
+        .modal-input::placeholder{color:#b0a899}
+        .btn-primary{width:100%;padding:14px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;background:var(--charcoal);color:var(--white);border:none;border-radius:9999px;cursor:pointer;transition:all .2s;font-family:inherit}
+        .btn-primary:hover{background:#333}
+        .btn-skip{font-size:12px;color:var(--warm-gray);text-align:center;cursor:pointer;margin-top:8px;transition:color .2s}
+        .btn-skip:hover{color:var(--charcoal)}
+        .modal-success{text-align:center}
+        .modal-success h2{margin-bottom:4px}
+        .modal-success .check{font-size:48px;margin-bottom:16px}
+        .modal-success p{margin-bottom:24px}
+        .btn-back{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;background:var(--white);color:var(--charcoal);border:1px solid var(--charcoal);border-radius:9999px;cursor:pointer;font-family:inherit;text-decoration:none;transition:all .2s}
+        .btn-back:hover{background:var(--charcoal);color:var(--white)}
+        .learn-more{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+        .learn-more p{font-size:12px;color:var(--warm-gray);text-align:center;line-height:1.6}
+        .learn-more strong{color:var(--charcoal)}
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="dashboard.html" class="nav-logo">FashionHero</a>
+            <div class="nav-right">
+                <a href="search-results.html" class="nav-store">Przeglądaj sklep →</a>
+                <span class="nav-user">Moda Kamila</span>
+                <div class="nav-avatar">MK</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <div class="sidebar">
+            <a href="dashboard.html" class="sidebar-item active">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a href="products.html" class="sidebar-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Produkty
+            </a>
+            <a href="orders.html" class="sidebar-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                Zamówienia
+            </a>
+            <a href="stats.html" class="sidebar-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                Statystyki
+            </a>
+            <div class="sidebar-item sidebar-promote" onclick="openFakeDoor('sidebar', 'Sidebar navigation')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Promuj produkty <span class="sidebar-new">Nowe</span>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="welcome">
+                <h1>Cześć, Kamilo</h1>
+                <p>Twoje ostatnie 30 dni na FashionHero</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Przychody</div>
+                    <div class="stat-value">8 247 zł</div>
+                    <div class="stat-change up">+12%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Zamówienia</div>
+                    <div class="stat-value">41</div>
+                    <div class="stat-change up">+8%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Wyświetlenia</div>
+                    <div class="stat-value">2 340</div>
+                    <div class="stat-change down">-3%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Konwersja</div>
+                    <div class="stat-value">1.75%</div>
+                    <div class="stat-change down">-0.2 p.p.</div>
+                </div>
+            </div>
+
+            <div class="section-title">Twoje produkty</div>
+            <div class="products-table">
+                <div class="products-header">
+                    <span>Produkt</span><span>Cena</span><span>Wyświetlenia</span><span>Sprzedane</span><span>Zwroty</span><span></span>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/czarna-sukienka.jpg" alt="Czarna sukienka midi" loading="lazy"></div><div><div class="product-name">Czarna sukienka midi</div><div class="product-sku">SKU-001</div></div></div>
+                    <div class="product-cell">199 zł</div><div class="product-cell">847</div><div class="product-cell">12</div><div class="product-cell muted">4 (33%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-001','Czarna sukienka midi')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/plaszcz.jpg" alt="Beżowy płaszcz" loading="lazy"></div><div><div class="product-name">Beżowy płaszcz oversized</div><div class="product-sku">SKU-002</div></div></div>
+                    <div class="product-cell">349 zł</div><div class="product-cell">512</div><div class="product-cell">8</div><div class="product-cell muted">1 (13%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-002','Beżowy płaszcz oversized')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/torba.jpg" alt="Skórzana torba" loading="lazy"></div><div><div class="product-name">Skórzana torba shopper</div><div class="product-sku">SKU-003</div></div></div>
+                    <div class="product-cell">289 zł</div><div class="product-cell">1 203</div><div class="product-cell">19</div><div class="product-cell muted">2 (11%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-003','Skórzana torba shopper')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/szpilki.jpg" alt="Szpilki nude" loading="lazy"></div><div><div class="product-name">Szpilki nude 8cm</div><div class="product-sku">SKU-004</div></div></div>
+                    <div class="product-cell">259 zł</div><div class="product-cell">389</div><div class="product-cell">5</div><div class="product-cell muted">2 (40%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-004','Szpilki nude 8cm')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/szorty.jpg" alt="Jeansowe szorty" loading="lazy"></div><div><div class="product-name">Jeansowe szorty high waist</div><div class="product-sku">SKU-005</div></div></div>
+                    <div class="product-cell">149 zł</div><div class="product-cell">678</div><div class="product-cell">11</div><div class="product-cell muted">3 (27%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-005','Jeansowe szorty high waist')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+                <div class="product-row">
+                    <div class="product-info"><div class="product-thumb"><img src="img/kapelusz.jpg" alt="Słomkowy kapelusz" loading="lazy"></div><div><div class="product-name">Słomkowy kapelusz plażowy</div><div class="product-sku">SKU-006</div></div></div>
+                    <div class="product-cell">89 zł</div><div class="product-cell">156</div><div class="product-cell">2</div><div class="product-cell muted">0 (0%)</div>
+                    <div><button class="btn-promote" onclick="openFakeDoor('SKU-006','Słomkowy kapelusz plażowy')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Promuj</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="modal">
+            <div id="modal-form" style="display:flex;flex-direction:column;gap:0">
+                <div class="modal-icon">🚀</div>
+                <h2>Reklama na FashionHero</h2>
+                <p>Funkcja promowania produktów jest w fazie testowania. Pozwoli Ci wyświetlać Twoje produkty na szczycie wyników wyszukiwania — płacisz tylko za kliknięcie.<br><br>Zostaw e-mail, a powiadomimy Cię o starcie.</p>
+                <div class="modal-form">
+                    <input type="email" id="email-input" class="modal-input" placeholder="twoj@email.pl">
+                    <button class="btn-primary" onclick="submitEmail()">Powiadom mnie o starcie</button>
+                </div>
+                <div class="btn-skip" onclick="closeOverlay()">Może później</div>
+                <div class="learn-more">
+                    <p><strong>Jak to będzie działać?</strong><br>Wybierasz produkty, ustallasz słowa kluczowe i budżet. Twój produkt pojawia się na pozycji 1-2 w wynikach wyszukiwania z tagiem "Sponsorowane". Płacisz tylko za kliknięcie — od 0,10 zł. Średni ROAS na marketplace: 4,2x.</p>
+                </div>
+            </div>
+            <div id="modal-success" class="modal-success" style="display:none">
+                <div class="check">✓</div>
+                <h2>Dziękujemy, Kamilo!</h2>
+                <p>Powiadomimy Cię jako jednego z pierwszych, gdy uruchomimy reklamy na FashionHero.</p>
+                <a href="#" class="btn-back" onclick="closeOverlay();return false">Wróć do panelu</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TRACKING_START=Date.now();
+        function openFakeDoor(sku,name){
+            const t=((Date.now()-TRACKING_START)/1000).toFixed(1);
+            console.log(`[FAKE DOOR] click | product=${sku} | name="${name}" | time=${t}s | ts=${new Date().toISOString()}`);
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('modal-form').style.display='flex';
+            document.getElementById('modal-form').style.flexDirection='column';
+            document.getElementById('modal-success').style.display='none';
+            document.getElementById('email-input').value='';
+            document.getElementById('email-input').style.borderColor='';
+            setTimeout(()=>document.getElementById('email-input').focus(),100);
+        }
+        function submitEmail(){
+            const email=document.getElementById('email-input').value;
+            if(!email||!email.includes('@')||!email.includes('.')){document.getElementById('email-input').style.borderColor='#e07a5f';return}
+            console.log(`[FAKE DOOR] email_captured | email=${email} | ts=${new Date().toISOString()}`);
+            document.getElementById('modal-form').style.display='none';
+            document.getElementById('modal-success').style.display='block';
+        }
+        function closeOverlay(){
+            console.log(`[FAKE DOOR] overlay_closed | ts=${new Date().toISOString()}`);
+            document.getElementById('overlay').classList.remove('active');
+        }
+        document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeOverlay()});
+        document.getElementById('email-input').addEventListener('keydown',function(e){if(e.key==='Enter')submitEmail()});
+    </script>
+</body>
+</html>
